@@ -7,7 +7,7 @@ var map = new mapboxgl.Map({
 });
 
 function background(value) {
-  if (value <= 30) {
+  if (value <= 20) {
     return "green"
   } else if (value < 38) {
     return "#FCE75D"
