@@ -1,0 +1,63 @@
+body {
+  font-family: helvetica, arial, sans-serif;
+}
+
+#title{
+  font-weight: lighter;
+  font-size: 1.5em;
+  display: block;
+  text-align: center;
+  margin: 1em auto 0;
+}
+
+#map {
+  margin: 2em auto;
+  width: 90%;
+  height: 590px;
+}
+
+.marker, .mapboxgl-marker {
+  cursor: pointer;
+  border-radius: 50%;
+  line-height: 30px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  border: 1px solid white;
+  box-shadow: 0px 0px 16px 0px rgba(0,0,0,0.75);
+}
+
+.small {
+  display: block;
+  font-size: 0.75em;
+  margin: 2em auto;
+  text-align: center;
+}
+
+a, a:active, a:visited, a:hover {
+  color: #00F;
+  text-decoration: none;
+  font-weight: lighter;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+strong a, a:hover {
+  font-weight: bolder;
+}
+
+@media (min-width: 640px) {
+  .fit {
+    font-size: 4rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .fit {
+    font-size: 2rem;
+  }
+}

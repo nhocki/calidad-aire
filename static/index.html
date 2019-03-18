@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Never cache. Ever. -->
+  <meta http-equiv="cache-control" content="max-age=0" />
+  <meta http-equiv="cache-control" content="no-cache" />
+  <meta http-equiv="expires" content="0" />
+  <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+  <meta http-equiv="pragma" content="no-cache" />
+  <title>Calidad del aire en Medellín</title>
+  <meta content="Calidad del aire en Medellín" property="og:site_name">
+  <meta content="Calidad del aire en Medellín" property="og:title">
+  <meta content="website" property="og:type">
+  <meta name="description" content="Información de la calidad del aire en Medellín.">
+  <meta property="og:description" content="Información de la calidad del aire en Medellín.">
+  <meta content="http://siata.picoyplaca.org" property="og:url">
+  <link rel="source" href="https://github.com/nhocki/pico-y-placa-medellin" title="Source Code">
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+
+  <!-- <script src='https://api.mapbox.com/mapbox.js/v3.2.0/mapbox.js'></script>
+  <link href='https://api.mapbox.com/mapbox.js/v3.2.0/mapbox.css' rel='stylesheet' /> -->
+</head>
+
+<body id="container">
+
+<h1 id="title">Calidad del aire en Medellín</h1>
+
+<div class='small'>Última actualización <span id="update"></span></div>
+<a href='https://github.com/nhocki/calidad-aire' class='small' target="_blank">
+  Este sitio es open source
+</a>
+
+<div id='map'></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-87129502-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-87129502-2');
+</script>
+
+</body>
+</html>
