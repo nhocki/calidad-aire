@@ -7,15 +7,17 @@ var map = new mapboxgl.Map({
 });
 
 function background(value) {
-  if (value <= 20) {
+  if (value <= 12) {
     return "green"
-  } else if (value < 38) {
+  } else if (value <= 37) {
     return "#FCE75D"
   } else if (value <= 55) {
     return "#F88137"
+  } else if (value <= 150) {
+    return "#DC3135"
   }
 
-  return "#DC3135"
+  return "#53116A"
 }
 
 document.getElementById("update").innerHTML = data.generated_at;
@@ -33,6 +35,9 @@ map.on('load', function () {
     el.className = 'marker';
     el.innerText = element.value;
     el.style.background = background(element.value);
+    if (element.value > 150) {
+      el.style.color = '#FFF';
+    }
 
     new mapboxgl.Marker(el)
       .setLngLat([element.longitude, element.latitude])
