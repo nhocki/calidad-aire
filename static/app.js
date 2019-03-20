@@ -7,7 +7,9 @@ var map = new mapboxgl.Map({
 });
 
 function background(value) {
-  if (value <= 12) {
+  if (value < 0) {
+    return "black"
+  } else if (value <= 12) {
     return "green"
   } else if (value <= 37) {
     return "#FCE75D"
@@ -35,8 +37,12 @@ map.on('load', function () {
     el.className = 'marker';
     el.innerText = element.value;
     el.style.background = background(element.value);
-    if (element.value > 150) {
+    if (element.value > 150 || element.value < 0) {
       el.style.color = '#FFF';
+    }
+
+    if (element.value < 0) {
+      el.innerText = 'X';
     }
 
     new mapboxgl.Marker(el)
