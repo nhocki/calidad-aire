@@ -10,11 +10,13 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/cloudwatch"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
@@ -181,7 +183,55 @@ func run() error {
 	}
 
 	js := []byte(fmt.Sprintf("var data = %s;", string(raw)))
-	return upload(s, "data.js", js)
+	if err := upload(s, "data.js", js); err != nil {
+		return err
+	}
+
+	return recordMetrics(s, data.Stations)
+}
+
+func asciiName(name string) string {
+	name = strings.Replace(name, "á", "a", -1)
+	name = strings.Replace(name, "é", "e", -1)
+	name = strings.Replace(name, "í", "i", -1)
+	name = strings.Replace(name, "ó", "o", -1)
+	name = strings.Replace(name, "ú", "u", -1)
+	name = strings.Replace(name, "ü", "u", -1)
+	name = strings.Replace(name, "#", "No. ", -1)
+
+	return name
+}
+
+func recordMetrics(s *session.Session, stations []*MeasurementStation) error {
+	svc := cloudwatch.New(s)
+	var metrics []*cloudwatch.MetricDatum
+
+	for _, station := range stations {
+		if station.Value < 0 {
+			station.Value = 0
+		}
+
+		datum := &cloudwatch.MetricDatum{
+			MetricName: aws.String("PM25"),
+			Unit:       aws.String("Count"),
+			Value:      aws.Float64(station.Value),
+			Dimensions: []*cloudwatch.Dimension{
+				&cloudwatch.Dimension{
+					Name:  aws.String("StationName"),
+					Value: aws.String(asciiName(station.Name)),
+				},
+			},
+		}
+
+		metrics = append(metrics, datum)
+	}
+
+	_, err := svc.PutMetricData(&cloudwatch.PutMetricDataInput{
+		Namespace:  aws.String("Station/2.5Meassurements"),
+		MetricData: metrics,
+	})
+
+	return err
 }
 
 func Handler(ctx context.Context) error {
