@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -235,7 +236,14 @@ func recordMetrics(s *session.Session, stations []*MeasurementStation) error {
 }
 
 func Handler(ctx context.Context) error {
-	return run()
+	for i := 0; i < 3; i++ {
+		log.Printf("[%d/3] Fetching data", i+1)
+		if err := run(); err == nil {
+			return nil
+		}
+	}
+
+	return errors.New("could not get data after 3 attempts")
 }
 
 func main() {
