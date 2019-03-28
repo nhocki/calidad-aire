@@ -5,6 +5,7 @@ OUTPUT?=scrapper
 LAMBDA_NAME?=siataScrapper
 ZIP_FILE?=scrapper.zip
 
+.PHONY: static
 
 default: build
 
@@ -17,6 +18,8 @@ clean:
 zip: build
 	${ZIP} -r ${ZIP_FILE} ${OUTPUT}
 
-deploy: zip
-	sh ./deploy.sh
+deploy: zip static
 	AWS_REGION=us-east-1 aws lambda update-function-code --function-name ${LAMBDA_NAME} --zip-file fileb://${ZIP_FILE} --publish
+
+static:
+	sh ./deploy.sh
