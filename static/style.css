@@ -13,7 +13,7 @@ body {
 #map {
   margin: 2em auto;
   width: 90%;
-  height: 590px;
+  height: 570px;
 }
 
 .marker, .mapboxgl-marker {
@@ -44,6 +44,27 @@ a, a:active, a:visited, a:hover {
 
 a:hover {
   text-decoration: underline;
+}
+
+table, th, tr, td {
+  border: 1px solid black;
+}
+
+#legend {
+  text-align: center;
+  vertical-align: middle;
+  border-collapse: collapse;
+  line-height: 3em;
+  font-size: 0.75em;
+}
+
+.lcolor {
+  min-height: 35px;
+  min-width: 35px;
+}
+
+.lcategory {
+  padding: 0 0.6em;
 }
 
 strong a, a:hover {

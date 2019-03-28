@@ -35,11 +35,43 @@
 <h1 id="title">Calidad del aire en Medellín</h1>
 
 <div class='small'>Última actualización <span id="update"></span></div>
-<a href='https://github.com/nhocki/calidad-aire' class='small' target="_blank">
+<div id='map'></div>
+
+<table id='legend' align="center">
+  <tr>
+    <th>Color</th><th>Categoría</th><th>Rango</th>
+  </tr>
+
+  <tr>
+    <td class='lcolor' bgcolor="green"></td>
+    <td class='lcategory'>Buena</td>
+    <td>0 - 12</td>
+  <tr>
+  <tr>
+    <td class='lcolor' bgcolor="#FCE75D"></td>
+    <td class='lcategory'>Moderada</td>
+    <td>13 - 37</td>
+  <tr>
+  <tr>
+    <td class='lcolor' bgcolor="#F88137"></td>
+    <td class='lcategory'>Dañina a grupos sensibles</td>
+    <td>38 - 55</td>
+  <tr>
+  <tr>
+    <td class='lcolor' bgcolor="#DC3135"></td>
+    <td class='lcategory'>Dañina a la salud</td>
+    <td>56 - 150</td>
+  <tr>
+  <tr>
+    <td class='lcolor' bgcolor="#53116A"></td>
+    <td class='lcategory'>Muy dañina a la salud</td>
+    <td>150+</td>
+  <tr>
+</table>
+
+<a href='https://github.com/nhocki/calidad-aire' style='width: 300px;' class='small' target="_blank">
   Este sitio es open source
 </a>
-
-<div id='map'></div>
 
 <script src="data.js"></script>
 <script src="app.js"></script>
