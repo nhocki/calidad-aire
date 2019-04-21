@@ -10,14 +10,17 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatch"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
@@ -50,6 +53,15 @@ type siataPoint struct {
 			UpdatedAt   field `json:"fecha_ultima_actualizacion"`
 		} `json:"descripcion"`
 	} `json:"atributos"`
+}
+
+type measurement struct {
+	GeneratedAt string                `json:"generated_at"`
+	Stations    []*MeasurementStation `json:"stations"`
+}
+
+type historicMeassurements struct {
+	Measurements []*measurement `json:"measurements"`
 }
 
 // Station returns a normalized `MeasurementStation` from the messy
@@ -145,11 +157,7 @@ func run() error {
 		return err
 	}
 
-	var data struct {
-		GeneratedAt string                `json:"generated_at"`
-		Stations    []*MeasurementStation `json:"stations"`
-	}
-
+	var data measurement
 	loc, _ := time.LoadLocation("America/Bogota")
 	genTime := time.Now().In(loc)
 	data.GeneratedAt = genTime.Format(time.Stamp)
@@ -188,7 +196,22 @@ func run() error {
 		return err
 	}
 
-	return recordMetrics(s, data.Stations)
+	if err := recordMetrics(s, data.Stations); err != nil {
+		return err
+	}
+
+	historic, err := downloadHistoric(s)
+	if err != nil {
+		return err
+	}
+
+	historic.Measurements = append(historic.Measurements, &data)
+	raw, err = json.Marshal(historic)
+	if err != nil {
+		return err
+	}
+
+	return upload(s, "historic.json", raw)
 }
 
 func asciiName(name string) string {
@@ -201,6 +224,41 @@ func asciiName(name string) string {
 	name = strings.Replace(name, "#", "No. ", -1)
 
 	return name
+}
+
+func downloadHistoric(s *session.Session) (*historicMeassurements, error) {
+	var (
+		bucket = "siata.picoyplaca.org"
+		name   = "historic.json"
+
+		// client = http.Client{Timeout: 2 * time.Minute}
+		buff = aws.NewWriteAtBuffer(nil)
+	)
+
+	downloader := s3manager.NewDownloader(s)
+	log.Println("Downloading historic data")
+	_, err := downloader.Download(buff, &s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(name),
+	})
+
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			// If we can't find the historic measurements, just create a new one.
+			if aerr.Code() == s3.ErrCodeNoSuchKey {
+				historic := &historicMeassurements{
+					Measurements: []*measurement{},
+				}
+				return historic, nil
+			}
+		}
+		return nil, err
+	}
+
+	var historic *historicMeassurements
+	err = json.Unmarshal(buff.Bytes(), &historic)
+	log.Printf("Got %d historic data points", len(historic.Measurements))
+	return historic, err
 }
 
 func recordMetrics(s *session.Session, stations []*MeasurementStation) error {
@@ -236,16 +294,25 @@ func recordMetrics(s *session.Session, stations []*MeasurementStation) error {
 }
 
 func Handler(ctx context.Context) error {
+	var err error
 	for i := 0; i < 3; i++ {
 		log.Printf("[%d/3] Fetching data", i+1)
-		if err := run(); err == nil {
+		if err = run(); err == nil {
 			return nil
 		}
+		log.Printf("\tError: %s", err.Error())
 	}
 
 	return errors.New("could not get data after 3 attempts")
 }
 
 func main() {
-	lambda.Start(Handler)
+	if os.Getenv("_LAMBDA_SERVER_PORT") != "" || os.Getenv("LAMBDA") != "" {
+		lambda.Start(Handler)
+	} else {
+		if err := Handler(context.Background()); err != nil {
+			panic(err)
+		}
+		log.Println("All good!")
+	}
 }
