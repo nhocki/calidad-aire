@@ -211,7 +211,9 @@ func run() error {
 		return err
 	}
 
-	return upload(s, "historic.json", raw)
+	year, week := time.Now().ISOWeek()
+	name := fmt.Sprintf("historic-%d-%d.json", year, week)
+	return upload(s, name, raw)
 }
 
 func asciiName(name string) string {
@@ -229,11 +231,11 @@ func asciiName(name string) string {
 func downloadHistoric(s *session.Session) (*historicMeassurements, error) {
 	var (
 		bucket = "siata.picoyplaca.org"
-		name   = "historic.json"
-
-		// client = http.Client{Timeout: 2 * time.Minute}
-		buff = aws.NewWriteAtBuffer(nil)
+		buff   = aws.NewWriteAtBuffer(nil)
 	)
+
+	year, week := time.Now().ISOWeek()
+	name := fmt.Sprintf("historic-%d-%d.json", year, week)
 
 	downloader := s3manager.NewDownloader(s)
 	log.Println("Downloading historic data")
