@@ -24,6 +24,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
+const bucketName = "www.airemedellin.com"
+
 // MeasurementStation represents a single measurement station that
 // is placed somewhere in the cit
 type MeasurementStation struct {
@@ -96,7 +98,6 @@ func upload(s *session.Session, key string, data []byte) error {
 	log.Printf("Uploading file: %s", key)
 
 	var (
-		bucket      = "siata.picoyplaca.org"
 		acl         = "public-read"
 		contentType = "application/json"
 	)
@@ -105,7 +106,7 @@ func upload(s *session.Session, key string, data []byte) error {
 	_, err := uploader.Upload(&s3manager.UploadInput{
 		Body:        bytes.NewReader(data),
 		ACL:         aws.String(acl),
-		Bucket:      aws.String(bucket),
+		Bucket:      aws.String(bucketName),
 		Key:         aws.String(key),
 		ContentType: aws.String(contentType),
 	})
@@ -229,10 +230,7 @@ func asciiName(name string) string {
 }
 
 func downloadHistoric(s *session.Session) (*historicMeassurements, error) {
-	var (
-		bucket = "siata.picoyplaca.org"
-		buff   = aws.NewWriteAtBuffer(nil)
-	)
+	var buff = aws.NewWriteAtBuffer(nil)
 
 	year, week := time.Now().ISOWeek()
 	name := fmt.Sprintf("historic-%d-%d.json", year, week)
@@ -240,7 +238,7 @@ func downloadHistoric(s *session.Session) (*historicMeassurements, error) {
 	downloader := s3manager.NewDownloader(s)
 	log.Println("Downloading historic data")
 	_, err := downloader.Download(buff, &s3.GetObjectInput{
-		Bucket: aws.String(bucket),
+		Bucket: aws.String(bucketName),
 		Key:    aws.String(name),
 	})
 

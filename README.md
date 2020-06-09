@@ -2,5 +2,5 @@
 
 Una versión **mucho** más rápida de https://siata.gov.co/siata_nuevo/
 
-* http://siata.picoyplaca.org/ for HTML version
-* http://siata.picoyplaca.org/pm25.json for JSON results
+* http://airemedellin.com/ for HTML version
+* http://airemedellin.com/pm25.json for JSON results
